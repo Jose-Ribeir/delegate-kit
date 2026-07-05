@@ -1,0 +1,24 @@
+{
+  "name": "delegate-kit",
+  "description": "Specialist subagents + a delegation playbook for Claude Code.",
+  "owner": {
+    "name": "José Ribeiro",
+    "url": "https://github.com/Jose-Ribeir"
+  },
+  "plugins": [
+    {
+      "name": "delegate-kit",
+      "source": "./",
+      "description": "4 specialist subagents (thinker, super-thinker, researcher, simple-tasks) + the /subagents playbook for when to use each. Portable: works with zero setup, and taps Serena + graphify when available.",
+      "category": "development",
+      "version": "0.1.0",
+      "keywords": [
+        "claude-code",
+        "subagents",
+        "agents",
+        "delegation",
+        "orchestration"
+      ]
+    }
+  ]
+}
