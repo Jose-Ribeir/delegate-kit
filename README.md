@@ -22,8 +22,8 @@ Every long Claude Code session drowns in cheap work: fifteen greps to trace a fl
 
 | Agent | Model | Best at |
 |-------|-------|---------|
-| **thinker** | opus | Deep reasoning over context you already have — trade-offs, planning, debugging-by-reasoning. No tools, pure thought. |
-| **super-thinker** | fable | The same, top-tier — for the hardest, highest-stakes calls where depth beats speed. |
+| **super-thinker** | fable | Top-tier pure reasoning for the hardest, highest-stakes calls — subtle trade-offs, intricate plans, where depth beats speed. No tools. |
+| **thinker** | opus | Everyday deep reasoning over context you already have — trade-offs, planning, debugging-by-reasoning. No tools, pure thought. |
 | **researcher** | sonnet | Mapping how a system works end-to-end. Never dumps whole files; returns an anchored flow report. |
 | **simple-tasks** | haiku | Mechanical chores (commits, pushes, builds, file ops) **and** cheap multi-hop context-saving work. |
 
