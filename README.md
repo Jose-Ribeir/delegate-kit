@@ -1,12 +1,12 @@
 # delegate-kit
 
-**A curated bench of 4 specialist subagents for Claude Code — and the playbook for when to delegate to which.**
+**A curated bench of 5 specialist subagents for Claude Code — and the playbook for when to delegate to which.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-8A2BE2)
 ![Zero setup](https://img.shields.io/badge/setup-zero--config-brightgreen)
 
-Most agent collections give you a hundred role-experts (`react-expert`, `sql-expert`, …). **delegate-kit is the opposite: a small orchestration layer.** Four subagents organized not by domain but by *reasoning depth and context cost*, plus a `/subagents` skill that teaches the main agent **when to hand work off, and to whom** — so your expensive main context stays clean and your hard thinking gets the strongest model.
+Most agent collections give you a hundred role-experts (`react-expert`, `sql-expert`, …). **delegate-kit is the opposite: a small orchestration layer.** Five subagents organized not by domain but by *reasoning depth and context cost*, plus a `/subagents` skill that teaches the main agent **when to hand work off, and to whom** — so your expensive main context stays clean and your hard thinking gets the strongest model.
 
 ---
 
@@ -25,9 +25,10 @@ Every long Claude Code session drowns in cheap work: fifteen greps to trace a fl
 | **super-thinker** | fable | Top-tier pure reasoning for the hardest, highest-stakes calls — subtle trade-offs, intricate plans, where depth beats speed. No tools. |
 | **thinker** | opus | Everyday deep reasoning over context you already have — trade-offs, planning, debugging-by-reasoning. No tools, pure thought. |
 | **researcher** | sonnet | Mapping how a system works end-to-end. Never dumps whole files; returns an anchored flow report. |
+| **executer** | sonnet 4.6 | The coding workhorse. Implements a settled plan end-to-end — writes/edits code, runs the build & tests, fixes what it broke. Full tools incl. Edit/Write. |
 | **simple-tasks** | haiku | Mechanical chores (commits, pushes, builds, file ops) **and** cheap multi-hop context-saving work. |
 
-The **`/subagents`** skill is the playbook: it gives the main agent the roster, briefing rules for each agent, and a decision guide for picking the right one — including the classic chain **researcher maps → thinker decides → simple-tasks executes & commits**.
+The **`/subagents`** skill is the playbook: it gives the main agent the roster, briefing rules for each agent, and a decision guide for picking the right one — including the classic chain **researcher maps → thinker decides → executer builds, verifies & commits**.
 
 ## Install
 
@@ -39,7 +40,7 @@ The **`/subagents`** skill is the playbook: it gives the main agent the roster, 
 Then reload plugins (`/reload-plugins`) if needed. You now have:
 
 - the **`/delegate-kit:subagents`** skill (the playbook), and
-- four spawnable agents: `thinker`, `super-thinker`, `researcher`, `simple-tasks`.
+- five spawnable agents: `thinker`, `super-thinker`, `researcher`, `executer`, `simple-tasks`.
 
 > **Prefer the bare `/subagents` command?** Copy `skills/subagents/` into `~/.claude/skills/` and `agents/*.md` into `~/.claude/agents/`. Manual (non-plugin) skills aren't namespaced, so the command is `/subagents`.
 
@@ -55,7 +56,7 @@ Or just delegate in natural language and let Claude pick:
 
 - *"Trace how a request flows from the API route to the DB write."* → **researcher** returns an anchored flow report.
 - *"Given that flow, should we cache at the route or the service layer? Reason it through."* → **thinker** weighs the trade-off.
-- *"Now apply the change, run the tests, and commit it."* → **simple-tasks** executes and owns the commit.
+- *"Implement caching at the service layer, run the tests, and commit it."* → **executer** writes the code, verifies it, and commits its own work.
 
 ## Two modes — zero-config, or supercharged
 
@@ -70,7 +71,7 @@ No flags to flip — the agents use whatever is present and fall back cleanly wh
 
 ## Customizing
 
-- **Models** are pinned per agent in `agents/*.md` frontmatter (`model:`). Change any to a model you have access to — e.g. if you don't have `fable`, set `super-thinker` to `opus`.
+- **Models** are pinned per agent in `agents/*.md` frontmatter (`model:`). Change any to a model you have access to — e.g. if you don't have `fable`, set `super-thinker` to `opus`. `executer` is pinned to the explicit id `claude-sonnet-4-6` (chosen over Sonnet 5 for token efficiency on coding); if that id differs in your account, update it to your Sonnet 4.6 id rather than letting it fall back to a heavier model.
 - **Add your own agents** alongside these and reference them from your own copy of the skill.
 
 ## How it's structured
@@ -80,10 +81,11 @@ delegate-kit/
 ├── .claude-plugin/
 │   ├── marketplace.json     # marketplace registry (one plugin, source ./)
 │   └── plugin.json          # plugin manifest
-├── agents/                  # the 4 subagent definitions
+├── agents/                  # the 5 subagent definitions
 │   ├── thinker.md
 │   ├── super-thinker.md
 │   ├── researcher.md
+│   ├── executer.md
 │   └── simple-tasks.md
 └── skills/
     └── subagents/

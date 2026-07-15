@@ -9,7 +9,7 @@
     {
       "name": "delegate-kit",
       "source": "./",
-      "description": "4 specialist subagents (thinker, super-thinker, researcher, simple-tasks) + the /subagents playbook for when to use each. Portable: works with zero setup, and taps Serena + graphify when available.",
+      "description": "5 specialist subagents (thinker, super-thinker, researcher, executer, simple-tasks) + the /subagents playbook for when to use each. Portable: works with zero setup, and taps Serena + graphify when available.",
       "category": "development",
       "version": "0.1.0",
       "keywords": [

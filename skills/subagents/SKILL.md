@@ -1,6 +1,6 @@
 ---
 name: subagents
-description: "Roster of the specialized subagents the main agent can spawn, and when to use each. Four types: thinker (pure reasoning, no tools), super-thinker (pure reasoning, top-tier model, no tools — for the hardest calls), researcher (flow-mapping, never dumps whole files), simple-tasks (mechanical chores incl. commits/pushes AND cheap multi-hop context-saving work). Use when deciding how to delegate work — pick the right agent, give it the right brief. Offload many-hop low-judgment work to simple-tasks to keep the expensive main context clean."
+description: "Roster of the specialized subagents the main agent can spawn, and when to use each. Five types: thinker (pure reasoning, no tools), super-thinker (pure reasoning, top-tier model, no tools — for the hardest calls), researcher (flow-mapping, never dumps whole files), executer (the coding workhorse — writes/edits code, runs the build & tests, on an efficient model), simple-tasks (mechanical chores incl. commits/pushes AND cheap multi-hop context-saving work). Use when deciding how to delegate work — pick the right agent, give it the right brief. Offload implementation to executer and many-hop low-judgment work to simple-tasks to keep the expensive main context clean."
 ---
 
 # /subagents
@@ -14,9 +14,10 @@ The roster of specialized subagents you can spawn, what each is for, and how to 
 | **thinker** | opus | none | Deep reasoning over context you already have: analysis, trade-offs, planning, debugging-by-reasoning, hard decisions. |
 | **super-thinker** | fable | none | Same as thinker, but the top tier — reach for it when the reasoning is hardest or the call is highest-stakes and you want maximum depth. |
 | **researcher** | sonnet | Read/Grep/Glob/Bash (+ Serena & graphify when installed) | Understanding how something works: the full flow through the system and the nodes involved. |
+| **executer** | sonnet 4.6 | Full: Edit/Write, Bash, Read/Grep/Glob (+ Serena when installed) | Implementing a settled plan end-to-end: write/edit code, run the project's build & tests, fix what it broke, report verified results. |
 | **simple-tasks** | haiku | Read/Grep/Glob/Bash (+ Serena when installed) | Mechanical chores (commits, pushes, commands, builds, file ops) **and** multi-hop low-judgment work — chains of dependent steps that would otherwise burn the expensive main context. |
 
-> **Two modes for researcher & simple-tasks.** They work with **zero setup** using built-in `Read`/`Grep`/`Glob`/`Bash` (Standard mode). If the project has [Serena](https://github.com/oraios/serena) (symbol-precise navigation) and/or graphify (flow/structure graphs), they automatically prefer those for cheaper, more precise navigation (Power mode). Nothing to configure either way.
+> **Two modes for researcher, executer & simple-tasks.** They work with **zero setup** using built-in `Read`/`Grep`/`Glob`/`Bash` (Standard mode). If the project has [Serena](https://github.com/oraios/serena) (symbol-precise navigation) and/or graphify (flow/structure graphs), they automatically prefer those for cheaper, more precise navigation (Power mode). Nothing to configure either way.
 
 ---
 
@@ -48,7 +49,17 @@ The roster of specialized subagents you can spawn, what each is for, and how to 
 
 **Briefing rule — name the target and the question, and include the project root.** Tell it exactly what to understand and what to return, and pass the project root (e.g. `cwd: /path/to/project`) so it scopes its navigation correctly (and, in Power mode, points graphify/Serena at the right project). It comes back with a structured flow report: ordered path, key nodes, connections, and `path:line` anchors for everything — so you (or the next agent) can act from the report alone.
 
-## simple-tasks — the executor
+## executer — the coding workhorse
+
+**What it is:** the primary implementation agent — the main hands behind coding. Full tools including Edit/Write, running Sonnet 4.6 (deliberately: Sonnet 5 burns far more tokens for the same code, making it worse cost/perf than even Opus for this role; 4.6 is the efficient workhorse). Hand it a settled plan or a described change and it builds it end-to-end: reads the surrounding code, matches the repo's conventions, edits, runs the project's own build/tests/typecheck, fixes what it broke, and reports back verified results with verbatim output for anything that failed.
+
+**Use it when** the decision is made and code needs to exist. Any implementation work you'd otherwise do inline — feature code, bug fixes, refactors with a known shape, wiring a spec into the codebase — goes to the executer so your own context never gets spent on the edit–run–fix loop.
+
+**The boundaries.** Versus **simple-tasks** — simple-tasks executes a known route with zero judgment and never edits code; the executer implements a *described change* and makes the normal small calls a competent engineer makes (structure, reuse, edge cases, style). Rule of thumb: if the briefing is a command list, that's simple-tasks; if it's a change description, that's executer. Versus **thinker / super-thinker** — they decide, the executer builds; it will not re-open settled architecture, and if it hits a genuinely load-bearing ambiguity it stops and bounces the question back with a recommendation instead of guessing. It **commits the work it implements** (with the message you give it, pushing only when asked); reach for simple-tasks for standalone git chores that aren't tied to an implementation.
+
+**Briefing rule — give it the change, the settled decisions, and the verification bar.** State what to build and why, name the decisions that are already made so it doesn't re-open them, point it at the entry files or symbols, and define "done" (which build/tests must pass). Don't hand it open design questions — settle those with a thinker first, or expect them bounced back. Pass the project root (e.g. `cwd: /path/to/project`) so it works in the right place.
+
+## simple-tasks — the runner
 
 **What it is:** the cheap, fast hands. It executes mechanical, well-defined work and reports back condensed but complete. It runs all the shell/CLI work and **fully owns git, including commits and pushes.**
 
@@ -68,10 +79,13 @@ The roster of specialized subagents you can spawn, what each is for, and how to 
 
 - Need to **think** about what you already know → **thinker** (or **super-thinker** on Fable when the call is hardest / highest-stakes).
 - Need to **find out / understand** how something works, with a flow report to brief the next step → **researcher**.
+- Need to **build** something — write or change code and verify it — once the approach is settled → **executer**.
 - Need to **do** a clear mechanical task, **or** grind through many low-judgment hops to keep your own context clean → **simple-tasks**.
 
-**Default to offloading.** If a task is low-judgment but would cost *you* (the expensive main agent) a long string of reads/greps/commands, hand it to **simple-tasks** with a clear goal and stopping condition — even if you can't pre-write every step. The hops burn its cheap context instead of yours, and you get back a condensed report. Reserve your own context for the decisions only you can make.
+**Default to offloading.** If a task would cost *you* (the expensive main agent) a long string of reads/greps/commands or a grind of edit–run–fix cycles, hand it off — implementation to **executer**, low-judgment hops and chores to **simple-tasks** — with a clear goal and stopping condition, even if you can't pre-write every step. The work burns their cheaper context instead of yours, and you get back a condensed report. Reserve your own context for the decisions only you can make.
+
+**executer vs. simple-tasks:** if the briefing is a *change to implement* (needs ordinary engineering judgment and code edits), that's **executer** — and it commits the work it implements. If it's a *command list or mechanical route* with no design calls — including standalone git chores not tied to an implementation — that's **simple-tasks**.
 
 **researcher vs. simple-tasks for multi-hop:** pick **researcher** when the output is *understanding* — a structured flow map of how a system works. Pick **simple-tasks** when the output is *a concrete result or collected facts* and the path is mechanical (gather all X, apply Y everywhere, run Z and report).
 
-A common chain: **researcher** maps the flow → **thinker** reasons over those findings to decide the approach → **simple-tasks** executes and commits. Spawn each with a brief sized to its job; pass concrete pointers (paths, anchors, the exact route) so it doesn't re-discover what you already know.
+A common chain: **researcher** maps the flow → **thinker** reasons over those findings to decide the approach → **executer** implements, verifies, and commits the change. Spawn each with a brief sized to its job; pass concrete pointers (paths, anchors, the exact route) so it doesn't re-discover what you already know.

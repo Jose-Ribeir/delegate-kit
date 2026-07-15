@@ -5,7 +5,7 @@ Thanks for helping improve delegate-kit! This project is intentionally **small a
 ## Good contributions
 
 - **Sharper briefing guidance** in `skills/subagents/SKILL.md` — clearer rules for when to pick each agent, better briefing templates.
-- **A new specialist agent** that fills a real gap the current four don't cover. Open an issue first to discuss the gap.
+- **A new specialist agent** that fills a real gap the current five don't cover. Open an issue first to discuss the gap.
 - **Portability fixes** — anything that assumes a specific OS, shell, model, or MCP server should degrade gracefully.
 
 ## Ground rules
